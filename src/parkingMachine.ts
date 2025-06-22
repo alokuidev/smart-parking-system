@@ -50,11 +50,43 @@ export function getAllTickets(): Ticket[] {
   return loadTickets();
 }
 
+export function payTicket(barcode: string, paymentMethod: string) {
+  const tickets = loadTickets();
+  const ticket = tickets.find(t => t.barcode === barcode);
+  if (!ticket) {
+    throw new Error('Ticket not found');
+  }
+  if (ticket.paidAt) {
+    return {
+      message: 'Ticket already paid',
+      barcode: ticket.barcode,
+      paidAt: ticket.paidAt,
+      paymentMethod: ticket.paymentMethod,
+      amountPaid: 0,
+    };
+  }
+  const amountPaid = calculatePrice(barcode);
+  ticket.paidAt = Date.now();
+  ticket.paymentMethod = paymentMethod;
+  saveTickets(tickets);
+  return {
+    message: 'Payment successful',
+    barcode: ticket.barcode,
+    paidAt: ticket.paidAt,
+    paymentMethod: ticket.paymentMethod,
+    amountPaid,
+  };
+}
+
+// Update calculatePrice to return 0 if already paid
 export function calculatePrice(barcode: string): number {
   const tickets = loadTickets();
   const ticket = tickets.find(t => t.barcode === barcode);
   if (!ticket) {
     throw new Error('Ticket not found');
+  }
+  if (ticket.paidAt) {
+    return 0;
   }
   const now = Date.now();
   const durationMs = now - ticket.issuedAt;
