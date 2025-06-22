@@ -48,4 +48,16 @@ export function getTicket(): Ticket | null {
 // For debugging/testing
 export function getAllTickets(): Ticket[] {
   return loadTickets();
+}
+
+export function calculatePrice(barcode: string): number {
+  const tickets = loadTickets();
+  const ticket = tickets.find(t => t.barcode === barcode);
+  if (!ticket) {
+    throw new Error('Ticket not found');
+  }
+  const now = Date.now();
+  const durationMs = now - ticket.issuedAt;
+  const hours = Math.ceil(durationMs / (1000 * 60 * 60));
+  return hours * 2;
 } 
