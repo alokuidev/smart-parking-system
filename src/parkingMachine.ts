@@ -106,4 +106,9 @@ export function getTicketState(barcode: string): 'paid' | 'unpaid' {
     return 'paid';
   }
   return 'unpaid';
+}
+
+export function getFreeSpaces(): number {
+  const tickets = loadTickets();
+  return PARKING_SPACES - tickets.length;
 } 
