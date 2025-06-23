@@ -92,4 +92,18 @@ export function calculatePrice(barcode: string): number {
   const durationMs = now - ticket.issuedAt;
   const hours = Math.ceil(durationMs / (1000 * 60 * 60));
   return hours * 2;
+}
+
+export function getTicketState(barcode: string): 'paid' | 'unpaid' {
+  const tickets = loadTickets();
+  const ticket = tickets.find(t => t.barcode === barcode);
+  if (!ticket || !ticket.paidAt) {
+    return 'unpaid';
+  }
+  const now = Date.now();
+  const FIFTEEN_MINUTES = 15 * 60 * 1000;
+  if (now - ticket.paidAt <= FIFTEEN_MINUTES) {
+    return 'paid';
+  }
+  return 'unpaid';
 } 
